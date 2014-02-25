@@ -1,0 +1,494 @@
+std.norm<-function(n){
+x<-rnorm(n)
+y<-rnorm(n)
+matrix<-cbind(x,y)
+return(matrix)
+}
+std.norm(10)
+normal.with.var.option<-function(n, sd1, sd2){
+x<-rnorm(n, sd=sd1)
+y<-rnorm(n, sd=sd2)
+matrix<-cbind(x,y)
+return(matrix)
+}
+normal.with.var.option(10)
+normal.with.var.option(10,2,3)
+?rnorm
+?runif
+unif.voters<-function(n){
+x<-runif(n)
+y<-runif(n)
+matrix<-cbind(x,y)
+return(matrix)
+}
+unif.voters(10)
+library(MASS)
+?mvrnorm
+s <- matrix(c(10,3,3,2),2,2)
+mvrnorm(1,1,s)
+mvrnorm(1,2,s)
+mvrnorm(3,2,s)
+mvrnorm(3,c(2,2),s)
+mvnorm.voters<-function(n, mu1, mu2, sig){
+mat<-mvrnorm(n, mu=c(mu1, mu2), Sigma=sig)
+return(mat)
+}
+mvnrom.voters(10,2,3,s)
+mvnorm.voters(10,2,3,s)
+dist1 <- mvrnorm(10,mu=c(2,2),Sigma=s)
+dist1
+dist2 <- mvrnorm(10,mu=c(2,2),Sigma=s)
+dist2
+rbind(dist1,dist2)
+dist1
+matrix(sample(rbind(dist1,dist2),20),ncol=2)
+dist3 <- mvrnorm(10,mu=c(2,2),Sigma=s)
+dist3
+k <- rbind(dist1,dist2,dist3)
+k
+matrix(sample(k,20),ncol=2)
+mvnorm.mix<-function(n, mu1, mu2, sig, distnum=1){#
+  dist1<-mvrnorm(n, mu=c(mu1[1], mu2[1]), Sigma=sig)#
+  dist2<-mvrnorm(n, mu=c(mu1[2], mu2[2]), Sigma=sig)#
+  dist3<-mvrnorm(n, mu=c(mu1[3], mu2[3]), Sigma=sig)#
+  if(distnum==1){#
+    return(dist1)#
+  }#
+  if(distnum==2){#
+    mat<-rbind(dist1, dist2)#
+    samp<-matrix(sample(mat, 2*n), ncol=2)#
+    return(samp)#
+  }#
+  if(distnum==3){#
+    mat<-rbind(dist1, dist2, dist3)#
+    samp<-matrix(sample(mat, 2*n), ncol=2)#
+    return(samp)#
+  }#
+}
+mvnorm.mix(10,mu1=c(2,3,2),mu2=c(3,2,1),sig=s,distnum=3)
+mvnorm.mix(10,mu1=c(2,3,2),mu2=c(3,2,1),sig=s,distnum=2)
+mvnorm.mix(10,mu1=c(2,3,2),mu2=c(3,2,1),sig=s,distnum=1)
+vote1<-mvnorm.mix(100,c(2,6,10),c(3,10, 7),sig=s, distnum=2)
+parties<-matrix(c(10,9,8,5), nrow=2)
+vote1
+parties
+?pdist
+library(plyr)
+?pdist
+distances<-pdist(vote1, parties)
+library(pdist)
+distances<-pdist(vote1, parties)
+distances
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)
+distance.mat
+party<-NULL
+ifelse(distance.mat[,1]>distance.mat[,2], party[1]<-"red", party[1]<-"blue")
+party[1]
+vote1<-mvnorm.mix(100,c(2,6,10),c(3,10, 7),sig=s, distnum=2)#
+parties<-matrix(c(10,9,8,5), nrow=2)#
+parties#
+distances<-pdist(vote1, parties)#
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)#
+party<-NULL
+party[1]
+voters <- function(n,method){#
+#'n' specifies the number of voters and 'method' specifies the different distributions to draw from.#
+#
+if(method==std.norm){#
+	std.norm<-function(n){#
+		x<-rnorm(n)#
+		y<-rnorm(n)#
+		matrix<-cbind(x,y)#
+		return(matrix)#
+		}#
+		return(std.norm())#
+}#
+}
+voters(10,std.norm)
+?mvrnorm
+voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){
+std.norm<-function(n){
+x<-rnorm(n)
+y<-rnorm(n)
+matrix<-cbind(x,y)
+return(matrix)
+}
+normal.with.var.option<-function(n,sd){
+x<-rnorm(n,sd=sd[1])
+y<-rnorm(n,sd=sd[2])
+matrix<-cbind(x,y)
+return(matrix)
+}
+x<-runif(n)
+voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
+#
+#Run the function that creates standard normal distributed voter preferences.#
+std.norm<-function(n){#
+	x<-rnorm(n)#
+	y<-rnorm(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates normally distributed voter preferences with variance option.#
+normal.with.var.option<-function(n,sd){#
+	x<-rnorm(n,sd=sd[1])#
+	y<-rnorm(n,sd=sd[2])#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates uniformly distributed voter preferences.#
+unif.voters<-function(n){#
+	x<-runif(n)#
+	y<-runif(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates multivariate normal distributed voter preferences.#
+mvnorm.voters<-function(n,mu,Sigma){#
+	mat<-mvrnorm(n,mu,Sigma)#
+	return(mat)#
+	}#
+#
+#Run the function that creates voter preferences from up to three multivariate normal distributions.#
+mvnorm.mix<-function(n,mu,Sigma,distnum){#
+	dist1<-mvrnorm(n,mu=mu[1,2],Sigma)#
+	dist2<-mvrnorm(n,mu=mu[3,4],Sigma)#
+	dist3<-mvrnorm(n,mu=mu[5,6],Sigma)#
+	if(distnum==1){#
+		return(dist1)#
+		}#
+		if(distnum==2){#
+			mat<-rbind(dist1, dist2)#
+			samp<-matrix(sample(mat, 2*n), ncol=2)#
+			return(samp)#
+			}#
+			if(distnum==3){#
+				mat<-rbind(dist1, dist2, dist3)#
+				samp<-matrix(sample(mat, 2*n), ncol=2)#
+				return(samp)#
+				}#
+				}#
+#
+if(method=="std.norm"){#
+	std.norm(n)#
+}#
+#
+if(method=="normal.with.var.option"){#
+	normal.with.var.option(n,sd)#
+}#
+#
+if(method=="unif.voters"){#
+	unif.voters(n)#
+}#
+#
+if(method=="mvnorm.voters"){#
+	mvnorm.voters(n,mu,Sigma)#
+}#
+#
+if(method=="mvnorm.mix"){#
+	mvnorm.mix(n,mu,Sigma,distnum)#
+}#
+}
+voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
+#
+#Run the function that creates standard normal distributed voter preferences.#
+std.norm<-function(n){#
+	x<-rnorm(n)#
+	y<-rnorm(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates normally distributed voter preferences with variance option.#
+normal.with.var.option<-function(n,sd){#
+	x<-rnorm(n,sd=sd[1])#
+	y<-rnorm(n,sd=sd[2])#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates uniformly distributed voter preferences.#
+unif.voters<-function(n){#
+	x<-runif(n)#
+	y<-runif(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates multivariate normal distributed voter preferences.#
+mvnorm.voters<-function(n,mu,Sigma){#
+	mat<-mvrnorm(n,mu,Sigma)#
+	return(mat)#
+	}#
+#
+#Run the function that creates voter preferences from up to three multivariate normal distributions.#
+mvnorm.mix<-function(n,mu,Sigma,distnum){#
+	dist1<-mvrnorm(n,mu=mu[1,2],Sigma)#
+	dist2<-mvrnorm(n,mu=mu[3,4],Sigma)#
+	dist3<-mvrnorm(n,mu=mu[5,6],Sigma)#
+	if(distnum==1){#
+		return(dist1)#
+		}#
+		if(distnum==2){#
+			mat<-rbind(dist1, dist2)#
+			samp<-matrix(sample(mat, 2*n), ncol=2)#
+			return(samp)#
+			}#
+			if(distnum==3){#
+				mat<-rbind(dist1, dist2, dist3)#
+				samp<-matrix(sample(mat, 2*n), ncol=2)#
+				return(samp)#
+				}#
+				}#
+#
+if(method=="std.norm"){#
+	std.norm(n)#
+}#
+#
+if(method=="normal.with.var.option"){#
+	normal.with.var.option(n,sd)#
+}#
+#
+if(method=="unif.voters"){#
+	unif.voters(n)#
+}#
+#
+if(method=="mvnorm.voters"){#
+	mvnorm.voters(n,mu,Sigma)#
+}#
+#
+if(method=="mvnorm.mix"){#
+	mvnorm.mix(n,mu,Sigma,distnum)#
+}#
+}
+voters(std.norm,10)
+voters("std.norm",10)
+voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
+#
+#Run the function that creates standard normal distributed voter preferences.#
+std.norm<-function(n){#
+	x<-rnorm(n)#
+	y<-rnorm(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates normally distributed voter preferences with variance option.#
+normal.with.var.option<-function(n,sd){#
+	x<-rnorm(n,sd=sd[1])#
+	y<-rnorm(n,sd=sd[2])#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates uniformly distributed voter preferences.#
+unif.voters<-function(n){#
+	x<-runif(n)#
+	y<-runif(n)#
+	matrix<-cbind(x,y)#
+	return(matrix)#
+	}#
+#
+#Run the function that creates multivariate normal distributed voter preferences.#
+mvnorm.voters<-function(n,mu,Sigma){#
+	mat<-mvrnorm(n,mu,Sigma)#
+	return(mat)#
+	}#
+#
+#Run the function that creates voter preferences from up to three multivariate normal distributions.#
+mvnorm.mix<-function(n,mu,Sigma,distnum){#
+	dist1<-mvrnorm(n,mu=mu[1,2],Sigma)#
+	dist2<-mvrnorm(n,mu=mu[3,4],Sigma)#
+	dist3<-mvrnorm(n,mu=mu[5,6],Sigma)#
+	if(distnum==1){#
+		return(dist1)#
+		}#
+		if(distnum==2){#
+			mat<-rbind(dist1, dist2)#
+			samp<-matrix(sample(mat, 2*n), ncol=2)#
+			return(samp)#
+			}#
+			if(distnum==3){#
+				mat<-rbind(dist1, dist2, dist3)#
+				samp<-matrix(sample(mat, 2*n), ncol=2)#
+				return(samp)#
+				}#
+				}#
+#
+if(method=="std.norm"){#
+	return(std.norm(n))#
+}#
+#
+if(method=="normal.with.var.option"){#
+	return(normal.with.var.option(n,sd))#
+}#
+#
+if(method=="unif.voters"){#
+	return(unif.voters(n))#
+}#
+#
+if(method=="mvnorm.voters"){#
+	return(mvnorm.voters(n,mu,Sigma))#
+}#
+#
+if(method=="mvnorm.mix"){#
+	return(mvnorm.mix(n,mu,Sigma,distnum))#
+}#
+}
+voters("std.norm",10)
+voters("normal.with.var.option",10,c(2,3))
+voters("unif.voters",10)
+mvrnorm?
+?mvrnorm
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=matrix(c(4,5,6,5),2,2))
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=matrix(s,2,2))
+s
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=s,distnum=1)
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=s,distnum=2)
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=s,distnum=3)
+voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
+#
+#std.norm() creates standard normal distributed voter preferences.#
+std.norm<-function(n){#
+	x<-rnorm(n)#
+	y<-rnorm(n)#
+	mat<-cbind(x,y)#
+	return(mat)#
+}#
+#
+#normal.with.var.option() creates normally distributed voter preferences with variance option.#
+normal.with.var.option<-function(n,sd){#
+	x<-rnorm(n,sd=sd[1])#
+	y<-rnorm(n,sd=sd[2])#
+	mat<-cbind(x,y)#
+	return(mat)#
+}#
+#
+#unif.voters() creates uniformly distributed voter preferences.#
+unif.voters<-function(n){#
+	x<-runif(n)#
+	y<-runif(n)#
+	mat<-cbind(x,y)#
+	return(mat)#
+}#
+#
+#mvnorm.voters() creates multivariate normal distributed voter preferences.#
+mvnorm.voters<-function(n,mu,Sigma){#
+	mat<-mvrnorm(n,mu,Sigma)#
+	return(mat)#
+}#
+#
+#mvnorm.mix() creates voter preferences from up to three multivariate normal distributions.#
+mvnorm.mix<-function(n,mu,Sigma,distnum){#
+	dist1<-mvrnorm(n,mu=mu[1,2],Sigma)#
+	dist2<-mvrnorm(n,mu=mu[3,4],Sigma)#
+	dist3<-mvrnorm(n,mu=mu[5,6],Sigma)#
+	if(distnum==1){#
+		return(dist1)#
+		}#
+		if(distnum==2){#
+			mat<-rbind(dist1, dist2)#
+			samp<-matrix(sample(mat, 2*n), ncol=2)#
+			return(samp)#
+			}#
+			if(distnum==3){#
+				mat<-rbind(dist1, dist2, dist3)#
+				samp<-matrix(sample(mat, 2*n), ncol=2)#
+				return(samp)#
+				}#
+}#
+#
+#If the 'method' argument is "std.norm", run std.norm().#
+if(method=="std.norm"){#
+	return(std.norm(n))#
+}#
+#
+#If the 'method' argument is "normal.with.var.option", run normal.with.var.option().#
+if(method=="normal.with.var.option"){#
+	return(normal.with.var.option(n,sd))#
+}#
+#
+#If the 'method' argument is "unif.voters", run unif.voters().#
+if(method=="unif.voters"){#
+	return(unif.voters(n))#
+}#
+#
+#If the 'method' argument is "mvnorm.voters", run mvnorm.voters().#
+if(method=="mvnorm.voters"){#
+	return(mvnorm.voters(n,mu,Sigma))#
+}#
+#
+#If the 'method' argument is "mvnorm.mix", run mvnorm.mix().#
+if(method=="mvnorm.mix"){#
+	return(mvnorm.mix(n,mu,Sigma,distnum))#
+}#
+}
+voters("mvnorm.voters",10,mu=c(2,3),Sigma=s,distnum=3)
+voters
+voter.pos <- voters("mvnorm.voters",10,mu=c(2,3),Sigma=s,distnum=3)
+voter.pos
+party.pos <- matrix(c(3,4,7,8),2,2)
+party.pos
+pdist(voter.pos,party.pos)
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)
+distance.mat
+distances<-pdist(voter.pos, party.pos)
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)
+distance.mat
+voter.pos
+party.pos
+distances
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)
+affl<-NULL
+affl<-ifelse(distance.mat[,1]>distance.mat[,2], affl[1]<-"Rep", affl[1]<-"Dem")
+affl
+distance.mat
+affl<-NULL
+affl<-NULL
+affl
+ifelse(distance.mat[,1]>distance.mat[,2], "Rep","Dem")
+affl<-NULL
+affl<-ifelse(distance.mat[,1]<distance.mat[,2],"Rep","Dem")
+affl
+voters.pos
+voter.pos
+affiliation
+colnames(vote)<-c("x","y","affiliation")
+voters.mat<-cbind(voter.pos,affl)
+voters.mat
+?cbind
+colnames(voters.mat)<-c("x","y","affiliation")
+voters.mat
+affiliation<-function(voter.pos,party.pos){#
+#
+#pdist() gives a vector containing the distance between each voter and each party.  #
+distances<-pdist(voter.pos, party.pos)#
+#
+#Turn the vector of distances into a matrix.#
+distance.mat<-matrix(distances@dist, ncol=2, byrow=TRUE)#
+#
+#Create a NULL object.#
+affl<-NULL#
+#
+#If the value in the first column in distance.mat is smaller than the value in the second column, assign "Rep", if not assign "Dem".#
+affl<-ifelse(distance.mat[,1]<distance.mat[,2],"Rep","Dem")#
+#
+#Column bind the matrix of voter preferences and the vector of affiliations.#
+voters.mat<-cbind(voter.pos,affl)#
+#
+#Assign appropriate column names.#
+colnames(voters.mat)<-c("x","y","affiliation")#
+#
+#Return voters.mat#
+return(voters.mat)#
+}
+party.pos
+affiliation(voters.pos,party.pos)
+affiliation(voter.pos,party.pos)
+distances
+party.pos
+distance.mat
+plot(voters.mat[,1],voters.mat[,2])
