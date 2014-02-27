@@ -140,12 +140,13 @@ maxi <- max(as.numeric(voters.mat[,1:2]),party.pos)
 #Create an empty plot.	
 plot(NULL,xlab="Dimension 1",ylab="Dimension 2",xlim=c(mini,maxi),ylim=c(mini,maxi),type="n")
 
-#Plot the positions of the two parties. We'll assign the first row in the matrix as the Republican Party and the second row as the Democratic Party.
-points(party.pos[1,1],party.pos[1,2],pch="R",col="red")
-points(party.pos[2,1],party.pos[2,2],pch="D",col="blue")
-
 #Plot the positions of the voters, and specify their affiliations with the colors red and blue.
 points(voters.mat[,1],voters.mat[,2],col=ifelse(voters.mat[,3]=="Rep","red","blue"),pch=19)
+
+#Plot the positions of the two parties. We'll assign the first row in the matrix as the Republican Party and the second row as the Democratic Party.
+points(party.pos[1,1],party.pos[1,2],pch="R",col="red4")
+points(party.pos[2,1],party.pos[2,2],pch="D",col="blue4")
+
 
 #Give a title to the plot.
 title("Positions of parties and voters")
@@ -176,6 +177,49 @@ voters2.mat <- affiliation(voter.pos=voters2,party.pos=parties2)
 #Check the visualization function. It works!
 visualization(party.pos=parties2,voters.mat=voters2.mat)
 
-#A word of caution: Although the functions we created work correctly, the outputs can look odd depending on how odd the distribution of voter preferences and party positions are. So be careful to have reasonable and realistic voter preferences and party positions.
+#A word of caution: Although the functions we created work correctly, 
+#the outputs can look odd depending on how odd the distribution of 
+#voter preferences and party positions are. So be careful to have 
+#reasonable and realistic voter preferences and party positions.
+
+
+##Function for getting things moving 2
+##setting mean and sd as options passed down to give users more control. 
+
+##function for producing relocating parties. For now, it only relocates
+##to the center of the parties. Voters do not yet re-align.
+party.relocation<-function(voters, mean=0, sd=5){
+  ##randomly calculates initial party position. 
+  party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
+  ##calculates affiliation using function above 
+  affl<-affiliation(voter.pos=voters,party.pos=party.pos)
+  ##setting graphing parameters to view two and a time to see before and after
+  par(mfrow=c(1,2))
+  ##visualize initial scenario at time t
+  visualization(party.pos=party.pos,voters.mat=affl)
+  ##create an empty matrix to fill with new party position
+  new.pos<-matrix(rep(0,4),2,2)
+  ##make dataframe for ease of calling later
+  affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
+  ##figure out which observations are dems
+  which.dems<-which(affl1$affiliation=="Dem")
+  ##make a matrix of dems and one of reps
+  dems<-affl1[which.dems,]
+  reps<-affl1[-which.dems,]
+  ##Fill in new party position, which is mean x and mean y
+  new.pos[2,]<-c(mean(as.numeric(dems$x)), 
+                 mean(as.numeric(dems$y)))
+  new.pos[1,]<-c(mean(as.numeric(reps$x)), 
+                 mean(as.numeric(reps$y)))
+  ##Look at new situation with parties located in center of points
+  visualization(party.pos=new.pos,voters.mat=affl)
+  
+}
+
+##voters is simply a matrix of voter positions as generated previously
+voters<- voters("normal.with.var.option",n=200,sd=c(6,2),distnum=2)
+
+##Try the function. Still need voters to realign and parties to relocate again.
+party.relocation(voters)
 
 
