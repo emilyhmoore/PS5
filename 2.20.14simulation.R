@@ -184,42 +184,84 @@ visualization(party.pos=parties2,voters.mat=voters2.mat)
 
 
 ##Function for getting things moving 2
-##setting mean and sd as options passed down to give users more control. 
 
-##function for producing relocating parties. For now, it only relocates
-##to the center of the parties. Voters do not yet re-align.
-party.relocation<-function(voters, mean=0, sd=5){
-  ##randomly calculates initial party position. 
-  party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
-  ##calculates affiliation using function above 
+#Load the corpcor package, which allows us to automatically convert a matrix to a positive definite matrix that can be used as the variance-covariance matrix in our function arguments.
+library(corpcor)
+ 
+##function for producing relocating parties.
+##setting mean and sd as options passed down to give users more control.
+#Specify the number of iterations as well.
+party.relocation<-function(mean=0, sd=5,iter=5){
+
+#Select a random type of voter distribution
+		method <- sample(c("std.norm","normal.with.var.option","unif.voters","mvnorm.voters","mvnorm.mix"),1)
+		
+#Select a random number of voters
+	n <- sample(100:1000,1)
+
+#According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
+	if(method=="std.norm"){
+		voters <- voters(method,n)
+	}
+	if(method=="normal.with.var.option"){
+		sd <- c(sample(1:5,1),sample(1:5,1))
+		voters <- voters(method,n,sd)
+	}
+	if(method=="unif.voters"){
+		voters <- voters(method,n)
+	}
+	if(method=="mvnorm.voters"){
+		mu <- c(sample(-5:5,1),sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		voters <- voters(method,n,mu=mu,Sigma=Sigma)
+	}
+	if(method=="mvnorm.mix"){
+		mu <- replicate(6,sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		distnum <- sample(1:3,1)
+voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
+	}
+
+ ##randomly calculates initial party position.
+  	party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
+  	
+#The for loop iterates the simulation the designated amount of times.
+	for(i in 1:iter){
+  	
+  ##calculates affiliation using function above
   affl<-affiliation(voter.pos=voters,party.pos=party.pos)
-  ##setting graphing parameters to view two and a time to see before and after
-  par(mfrow=c(1,2))
+  
+  ##setting graphing parameters to view two at a time to see before and after
+   par(mfrow=c(1,2))
+   
   ##visualize initial scenario at time t
-  visualization(party.pos=party.pos,voters.mat=affl)
-  ##create an empty matrix to fill with new party position
-  new.pos<-matrix(rep(0,4),2,2)
+visualization(party.pos=party.pos,voters.mat=affl)
+
+   ##create an empty matrix to fill with new party position
+  party.pos<-matrix(rep(0,4),2,2)
+  
   ##make dataframe for ease of calling later
   affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
+  
   ##figure out which observations are dems
   which.dems<-which(affl1$affiliation=="Dem")
+  
   ##make a matrix of dems and one of reps
   dems<-affl1[which.dems,]
   reps<-affl1[-which.dems,]
-  ##Fill in new party position, which is mean x and mean y
-  new.pos[2,]<-c(mean(as.numeric(dems$x)), 
-                 mean(as.numeric(dems$y)))
-  new.pos[1,]<-c(mean(as.numeric(reps$x)), 
-                 mean(as.numeric(reps$y)))
-  ##Look at new situation with parties located in center of points
-  visualization(party.pos=new.pos,voters.mat=affl)
   
+  ##Fill in new party position, which is mean x and mean y
+  party.pos[2,]<-c(mean(as.numeric(dems$x)), 
+                 mean(as.numeric(dems$y)))
+  party.pos[1,]<-c(mean(as.numeric(reps$x)), 
+                 mean(as.numeric(reps$y)))
+                 
+  ##Look at new situation at time t+1 with parties located in center of points
+visualization(party.pos=party.pos,voters.mat=affl)
+}
 }
 
-##voters is simply a matrix of voter positions as generated previously
-voters<- voters("normal.with.var.option",n=200,sd=c(6,2),distnum=2)
-
-##Try the function. Still need voters to realign and parties to relocate again.
-party.relocation(voters)
+##Try the function.
+party.relocation()
 
 
