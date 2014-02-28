@@ -156,10 +156,10 @@ title("Positions of parties and voters")
 voters1 <- voters("mvnorm.mix",n=100,mu=c(-5,-4,7,8,1,2),Sigma=matrix(c(3,2,6,5),2,2),distnum=2)
 
 #Decide upon random party positions.
-party.pos<- matrix(c(-4,-5,8,9),2,2)
+parties1<- matrix(c(-4,-5,8,9),2,2)
 
 #Calculate the affiliations of the voters.
-voters.mat <- affiliation(voter.pos=voters1,party.pos=parties1)
+voters1.mat <- affiliation(voter.pos=voters1,party.pos=parties1)
 
 #Check the visualization function. It works.
 visualization(party.pos=parties1,voters.mat=voters1.mat)

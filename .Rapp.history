@@ -192,78 +192,6 @@ if(method=="mvnorm.mix"){#
 	mvnorm.mix(n,mu,Sigma,distnum)#
 }#
 }
-voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
-#
-#Run the function that creates standard normal distributed voter preferences.#
-std.norm<-function(n){#
-	x<-rnorm(n)#
-	y<-rnorm(n)#
-	matrix<-cbind(x,y)#
-	return(matrix)#
-	}#
-#
-#Run the function that creates normally distributed voter preferences with variance option.#
-normal.with.var.option<-function(n,sd){#
-	x<-rnorm(n,sd=sd[1])#
-	y<-rnorm(n,sd=sd[2])#
-	matrix<-cbind(x,y)#
-	return(matrix)#
-	}#
-#
-#Run the function that creates uniformly distributed voter preferences.#
-unif.voters<-function(n){#
-	x<-runif(n)#
-	y<-runif(n)#
-	matrix<-cbind(x,y)#
-	return(matrix)#
-	}#
-#
-#Run the function that creates multivariate normal distributed voter preferences.#
-mvnorm.voters<-function(n,mu,Sigma){#
-	mat<-mvrnorm(n,mu,Sigma)#
-	return(mat)#
-	}#
-#
-#Run the function that creates voter preferences from up to three multivariate normal distributions.#
-mvnorm.mix<-function(n,mu,Sigma,distnum){#
-	dist1<-mvrnorm(n,mu=mu[1,2],Sigma)#
-	dist2<-mvrnorm(n,mu=mu[3,4],Sigma)#
-	dist3<-mvrnorm(n,mu=mu[5,6],Sigma)#
-	if(distnum==1){#
-		return(dist1)#
-		}#
-		if(distnum==2){#
-			mat<-rbind(dist1, dist2)#
-			samp<-matrix(sample(mat, 2*n), ncol=2)#
-			return(samp)#
-			}#
-			if(distnum==3){#
-				mat<-rbind(dist1, dist2, dist3)#
-				samp<-matrix(sample(mat, 2*n), ncol=2)#
-				return(samp)#
-				}#
-				}#
-#
-if(method=="std.norm"){#
-	std.norm(n)#
-}#
-#
-if(method=="normal.with.var.option"){#
-	normal.with.var.option(n,sd)#
-}#
-#
-if(method=="unif.voters"){#
-	unif.voters(n)#
-}#
-#
-if(method=="mvnorm.voters"){#
-	mvnorm.voters(n,mu,Sigma)#
-}#
-#
-if(method=="mvnorm.mix"){#
-	mvnorm.mix(n,mu,Sigma,distnum)#
-}#
-}
 voters(std.norm,10)
 voters("std.norm",10)
 voters <- function(method,n,sd=NULL,mu=NULL,Sigma=NULL,distnum=NULL){#
@@ -446,7 +374,6 @@ affl<-NULL
 affl<-ifelse(distance.mat[,1]>distance.mat[,2], affl[1]<-"Rep", affl[1]<-"Dem")
 affl
 distance.mat
-affl<-NULL
 affl<-NULL
 affl
 ifelse(distance.mat[,1]>distance.mat[,2], "Rep","Dem")
