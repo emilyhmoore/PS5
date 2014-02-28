@@ -227,7 +227,8 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
 
  ##randomly calculates initial party position.
   	party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
- 
+
+#Store initial party position in party.vector, which will be expanded throughout the simulation.
     party.vector <- as.vector(party.pos)
   	
 #The for loop iterates the simulation the designated amount of times.
@@ -240,7 +241,7 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
    par(mfrow=c(1,2))
    
   ##visualize initial scenario at time t
-   visualization(party.pos=party.pos,voters.mat=affl)
+visualization(party.pos=party.pos,voters.mat=affl)
 
    ##create an empty matrix to fill with new party position
   party.pos<-matrix(rep(0,4),2,2)
@@ -260,16 +261,22 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
                  mean(as.numeric(dems$y)))
   party.pos[1,]<-c(mean(as.numeric(reps$x)), 
                  mean(as.numeric(reps$y)))
-  
+
+#Append the changed party position to party.vector, which is the previous party position.
   party.vector <- c(party.vector,party.pos)
   
-  visualization(party.pos=party.pos,voters.mat=affl)
-  
+#Plot time t+1.  
+visualization(party.pos=party.pos,voters.mat=affl)
   
 }
+
+#Convert party.vector into a matrix.
 party.mat<-matrix(party.vector, ncol=4, byrow=TRUE)
+
+#Rearrange the columns appropriately.
 party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4])
 colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y")
+
 return(party.mat)
 }
 
