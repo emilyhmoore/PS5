@@ -227,6 +227,8 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
 
  ##randomly calculates initial party position.
   	party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
+ 
+    party.vector <- as.vector(party.pos)
   	
 #The for loop iterates the simulation the designated amount of times.
 	for(i in 1:iter){
@@ -259,89 +261,18 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
   party.pos[1,]<-c(mean(as.numeric(reps$x)), 
                  mean(as.numeric(reps$y)))
   
+  party.vector <- c(party.vector,party.pos)
+  
   visualization(party.pos=party.pos,voters.mat=affl)
+  
+  
 }
-
+party.mat<-matrix(party.vector, ncol=4, byrow=TRUE)
+party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4])
+colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y")
+return(party.mat)
 }
 
 ##Try the function.
 party.relocation(iter=10)
-
-#This function returns the vector of positions the parties take throughout the simulation.
-party.relocation.vector<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=sample(1:10000, 1)){
-  
-  #Set the random seed based on the seed specified
-  set.seed(seed)
-
-  #According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
-	if(method=="std.norm"){
-		voters <- voters(method,n)
-	}
-	if(method=="normal.with.var.option"){
-		sd <- c(sample(1:5,1),sample(1:5,1))
-		voters <- voters(method,n,sd)
-	}
-	if(method=="unif.voters"){
-		voters <- voters(method,n)
-	}
-	if(method=="mvnorm.voters"){
-		mu <- c(sample(-5:5,1),sample(-5:5,1))
-		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
-		voters <- voters(method,n,mu=mu,Sigma=Sigma)
-	}
-	if(method=="mvnorm.mix"){
-		mu <- replicate(6,sample(-5:5,1))
-		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
-		distnum <- sample(1:3,1)
-    voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
-	}
-
- ##randomly calculates initial party position.
-  	party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
-
-#Store the initial party position in party.vector, which will be expanded throughout the simulation.
-  	party.vector <- party.pos
-  	
-#The for loop iterates the simulation the designated amount of times.
-	for(i in 1:iter){
-  	
-  ##calculates affiliation using function above
-  affl<-affiliation(voter.pos=voters,party.pos=party.pos)
-  
-  ##setting graphing parameters to view two at a time to see before and after
-   par(mfrow=c(1,2))
-   
-  ##visualize initial scenario at time t
-visualization(party.pos=party.pos,voters.mat=affl)
-
-   ##create an empty matrix to fill with new party position
-  party.pos<-matrix(rep(0,4),2,2)
-  
-  ##make dataframe for ease of calling later
-  affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
-  
-  ##figure out which observations are dems
-  which.dems<-which(affl1$affiliation=="Dem")
-  
-  ##make a matrix of dems and one of reps
-  dems<-affl1[which.dems,]
-  reps<-affl1[-which.dems,]
-  
-  ##Fill in new party position, which is mean x and mean y
-  party.pos[2,]<-c(mean(as.numeric(dems$x)), 
-                 mean(as.numeric(dems$y)))
-  party.pos[1,]<-c(mean(as.numeric(reps$x)), 
-                 mean(as.numeric(reps$y)))
-  
-##visualize scenario at time t+1  visualization(party.pos=party.pos,voters.mat=affl)
-
-#Append the changed party position to party.vector, which is the previous party position.
-party.vector <- c(party.vector,party.pos)
-}
-
-#The function returns the vector of simulated party positions
-return(party.vector)
-}
-
-party.relocation.vector(iter=10)
 
