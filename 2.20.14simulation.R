@@ -258,13 +258,13 @@ party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=s
                  mean(as.numeric(dems$y)))
   party.pos[1,]<-c(mean(as.numeric(reps$x)), 
                  mean(as.numeric(reps$y)))
-                 
-  ##Look at new situation at time t+1 with parties located in center of points
-visualization(party.pos=party.pos,voters.mat=affl)
+  
+  visualization(party.pos=party.pos,voters.mat=affl)
 }
+
 }
 
 ##Try the function.
-party.relocation(iter=15)
+party.relocation(iter=10)
 
 
