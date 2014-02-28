@@ -181,9 +181,6 @@ visualization(party.pos=parties2,voters.mat=voters2.mat)
 #voter preferences and party positions are. So be careful to have 
 #reasonable and realistic voter preferences and party positions.
 
-
-##Function for getting things moving 2
-
 #Load the corpcor package, which allows us to automatically 
 #convert a matrix to a positive definite matrix that can be 
 #used as the variance-covariance matrix in our function arguments.
@@ -192,12 +189,20 @@ library(corpcor)
 ##function for producing relocating parties.
 ##setting mean and sd as options passed down to give users more control.
 #Specify the number of iterations as well.
-party.relocation<-function(mean=0, sd=5,iter=5, method="std.norm"){
-	
-#Select a random number of voters
-	n <- sample(100:1000,1)
 
-#According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
+#n is the number of voters
+#mean is the mean of the party position draw
+#sd is the sd of the party position draw. If too high, results are weird.
+#iter is the number of iterations
+#method is the distribution type of voters
+#seed specifies the seed you want for the random parts. 
+
+party.relocation<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=sample(1:10000, 1)){
+  
+  #Set the random seed based on the seed specified
+  set.seed(seed)
+
+  #According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
 	if(method=="std.norm"){
 		voters <- voters(method,n)
 	}
