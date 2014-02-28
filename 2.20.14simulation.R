@@ -192,11 +192,8 @@ library(corpcor)
 ##function for producing relocating parties.
 ##setting mean and sd as options passed down to give users more control.
 #Specify the number of iterations as well.
-party.relocation<-function(mean=0, sd=5,iter=5){
-
-#Select a random type of voter distribution
-		method <- sample(c("std.norm","normal.with.var.option","unif.voters","mvnorm.voters","mvnorm.mix"),1)
-		
+party.relocation<-function(mean=0, sd=5,iter=5, method="std.norm"){
+	
 #Select a random number of voters
 	n <- sample(100:1000,1)
 
@@ -263,6 +260,6 @@ visualization(party.pos=party.pos,voters.mat=affl)
 }
 
 ##Try the function.
-party.relocation(iter=10)
+party.relocation(iter=15)
 
 
