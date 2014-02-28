@@ -134,14 +134,13 @@ return(voters.mat)
 visualization <-function(party.pos,voters.mat){
 
 #First, find the minimum and maximum ideological positions in order to use them as axes limits when plotting. Note that we have to find the minimum and maximum from the first two columns of 'voters.mat', because the third column includes letters (i.e. "Dem" and "Rep). We also have to convert 'voters.mat' into a numeric, because the values in the original matrix are characters.
-mini <- min(as.numeric(voters.mat[,1:2]),party.pos)
-maxi <- max(as.numeric(voters.mat[,1:2]),party.pos)
+#mini <- min(as.numeric(voters.mat[,1:2]),party.pos)
+#maxi <- max(as.numeric(voters.mat[,1:2]),party.pos)
 
-#Create an empty plot.	
-plot(NULL,xlab="Dimension 1",ylab="Dimension 2",xlim=c(mini,maxi),ylim=c(mini,maxi),type="n")
-
-#Plot the positions of the voters, and specify their affiliations with the colors red and blue.
-points(voters.mat[,1],voters.mat[,2],col=ifelse(voters.mat[,3]=="Rep","red","blue"),pch=19)
+#Create a plot of the voter positions	
+plot(x=voters.mat[,1],y=voters.mat[,2],xlab="Dimension 1",ylab="Dimension 2",
+     col=ifelse(voters.mat[,3]=="Rep","red","blue"),pch=19
+     )
 
 #Plot the positions of the two parties. We'll assign the first row in the matrix as the Republican Party and the second row as the Democratic Party.
 points(party.pos[1,1],party.pos[1,2],pch="R",col="red4")
@@ -157,10 +156,10 @@ title("Positions of parties and voters")
 voters1 <- voters("mvnorm.mix",n=100,mu=c(-5,-4,7,8,1,2),Sigma=matrix(c(3,2,6,5),2,2),distnum=2)
 
 #Decide upon random party positions.
-parties1 <- matrix(c(-4,-5,8,9),2,2)
+party.pos<- matrix(c(-4,-5,8,9),2,2)
 
 #Calculate the affiliations of the voters.
-voters1.mat <- affiliation(voter.pos=voters1,party.pos=parties1)
+voters.mat <- affiliation(voter.pos=voters1,party.pos=parties1)
 
 #Check the visualization function. It works.
 visualization(party.pos=parties1,voters.mat=voters1.mat)
@@ -185,7 +184,9 @@ visualization(party.pos=parties2,voters.mat=voters2.mat)
 
 ##Function for getting things moving 2
 
-#Load the corpcor package, which allows us to automatically convert a matrix to a positive definite matrix that can be used as the variance-covariance matrix in our function arguments.
+#Load the corpcor package, which allows us to automatically 
+#convert a matrix to a positive definite matrix that can be 
+#used as the variance-covariance matrix in our function arguments.
 library(corpcor)
  
 ##function for producing relocating parties.
@@ -219,7 +220,7 @@ party.relocation<-function(mean=0, sd=5,iter=5){
 		mu <- replicate(6,sample(-5:5,1))
 		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
 		distnum <- sample(1:3,1)
-voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
+    voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
 	}
 
  ##randomly calculates initial party position.
@@ -235,7 +236,7 @@ voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
    par(mfrow=c(1,2))
    
   ##visualize initial scenario at time t
-visualization(party.pos=party.pos,voters.mat=affl)
+   visualization(party.pos=party.pos,voters.mat=affl)
 
    ##create an empty matrix to fill with new party position
   party.pos<-matrix(rep(0,4),2,2)
@@ -262,6 +263,6 @@ visualization(party.pos=party.pos,voters.mat=affl)
 }
 
 ##Try the function.
-party.relocation()
+party.relocation(iter=10)
 
 
