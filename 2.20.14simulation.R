@@ -280,6 +280,71 @@ colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y")
 return(party.mat)
 }
 
-##Try the function.
+#Try the function.
 party.relocation(iter=10)
 
+
+####Explore your model####
+
+##Question 3
+
+#Install packages for parallel
+library(foreach)
+library(doMC)
+library(multicore)
+library(plyr)
+
+#Set the parallel environment.
+registerDoMC(cores=2)
+
+#parameter1: mean of party position in the party.relocation() function
+#parameter2: sd of party position in the party.relocation() function
+parameter1 <- seq(-1,1,length.out=3)
+parameter2 <- seq(1,3,length.out=3)
+
+#Create an expanded grid of the combinations of the two parameters.
+parameters.df <- expand.grid(mean=parameter1,sd=parameter2)
+
+#Run party.relocation() throughout the parameter space.
+result <- NULL
+for(i in 1:nrow(parameters.df)){
+result <- rbind(result,print(party.relocation(mean=parameters.df[i,1],sd=parameters.df[i,2])))
+}
+
+#Check the positions of parties throughout the simulation.
+result
+
+##Question 4
+
+#Our comparative static of interest is party positions of the Republican Party and the Democratic Party in the first dimension.
+#The input of interest is the mean of party positions we set for the previous problem. They are -1, 0, and 1.
+party.mean <- matrix(c(rep(-1,18),rep(0,18),rep(1,18)),ncol=3)
+
+#Extract the Republican Party's position in the first dimension.
+Rep.x <- result[,1]
+
+#Extract the positions of the Republican Party according to the different means of party positions.
+first.rep.mean <- Rep.x[seq(1,54,3)]
+second.rep.mean <- Rep.x[seq(2,54,3)]
+third.rep.mean <- Rep.x[seq(3,54,3)]
+
+#Repeat the process for the Democratic Party.
+Dem.x <- result[,3]
+first.dem.mean <- Dem.x[seq(1,54,3)]
+second.dem.mean <- Dem.x[seq(2,54,3)]
+third.dem.mean <- Dem.x[seq(3,54,3)]
+
+#Plot with the x-axis as the mean party position, and the y-axis as the simulated party positions.
+plot(NULL,xlab="mean party position",ylab="party positions throughout the simulation",xlim=c(-2,2),ylim=c(-3,3))
+points(party.mean[,1],first.rep.mean,col="red")
+points(party.mean[,2],second.rep.mean,col="red")
+points(party.mean[,3],third.rep.mean,col="red")
+points(party.mean[,1],first.dem.mean,col="blue")
+points(party.mean[,2],second.dem.mean,col="blue")
+points(party.mean[,3],third.dem.mean,col="blue")
+title("How party positions change depending on \n how the mean party position is initially set")
+
+#We can see from the plot that the spread of party positions narrows throughout the course of the simulation.
+
+
+####Expand your model####
