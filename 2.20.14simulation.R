@@ -348,3 +348,146 @@ title("How party positions change depending on \n how the mean party position is
 
 
 ####Expand your model####
+
+##Question 1
+
+#We will alter the function so that it can take three parties as an option.
+affiliation.party.number.option<-function(voter.pos,party.pos,party.number=3){
+
+#pdist() gives a vector containing the distance between each voter and each party.  
+distances<-pdist(voter.pos, party.pos)
+
+#Turn the vector of distances into a matrix.
+distance.mat<-matrix(distances@dist, ncol=party.number, byrow=TRUE)
+
+#Create a NULL object.
+affl<-NULL
+
+#Assign "Rep", "Dem", or "Green" according to where the minimum distance is.
+affl <- NULL
+for(i in 1:nrow(distance.mat)){
+affl <- c(affl,if(min(distance.mat[i,])==distance.mat[i,1]){"Rep"
+		}else{
+if(min(distance.mat[i,])==distance.mat[i,2]){
+	"Dem"
+}else{"Green"}
+		}
+)}
+
+#Column bind the matrix of voter preferences and the vector of affiliations.
+voters.mat<-cbind(voter.pos,affl)
+
+#Assign appropriate column names.
+colnames(voters.mat)<-c("x","y","affiliation")
+
+#Return voters.mat.
+return(voters.mat)
+}
+
+#Now alter the visualization function to take in party number option.
+visualization.party.number.option <-function(party.pos,voters.mat){
+
+#Create a plot of the voter positions	
+plot(x=voters.mat[,1],y=voters.mat[,2],xlab="Dimension 1",ylab="Dimension 2",
+     col=ifelse(voters.mat[,3]=="Rep","red",ifelse(voters.mat[,3]=="Dem","blue","green")))
+
+#Plot the positions of the three parties. We'll assign the first row in the matrix as the Republican Party, the second row as the Democratic Party, and the third row as the Green Party.
+points(party.pos[1,1],party.pos[1,2],pch="R",col="red4")
+points(party.pos[2,1],party.pos[2,2],pch="D",col="blue4")
+points(party.pos[3,1],party.pos[3,2],pch="G",col="green4")
+
+#Give a title to the plot.
+title("Positions of parties and voters")
+}
+
+#This function simulates position changes for three parties.
+party.relocation.party.number.option<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=sample(1:10000, 1),party.number=3){
+  
+  #Set the random seed based on the seed specified
+  set.seed(seed)
+
+  #According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
+	if(method=="std.norm"){
+		voters <- voters(method,n)
+	}
+	if(method=="normal.with.var.option"){
+		sd <- c(sample(1:5,1),sample(1:5,1))
+		voters <- voters(method,n,sd)
+	}
+	if(method=="unif.voters"){
+		voters <- voters(method,n)
+	}
+	if(method=="mvnorm.voters"){
+		mu <- c(sample(-5:5,1),sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		voters <- voters(method,n,mu=mu,Sigma=Sigma)
+	}
+	if(method=="mvnorm.mix"){
+		mu <- replicate(6,sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		distnum <- sample(1:3,1)
+    voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
+	}
+
+ ##randomly calculates initial party position.
+  	party.pos<- matrix(rnorm(party.number*2,mean=mean,sd=sd),party.number,2)
+
+#Store initial party position in party.vector, which will be expanded throughout the simulation.
+    party.vector <- as.vector(party.pos)
+  	
+#The for loop iterates the simulation the designated amount of times.
+	for(i in 1:iter){
+  	
+  ##calculates affiliation using function above
+  affl<-affiliation.party.number.option(voter.pos=voters,party.pos=party.pos)
+  
+  ##setting graphing parameters to view two at a time to see before and after
+   par(mfrow=c(1,2))
+   
+  ##visualize initial scenario at time t
+visualization.party.number.option(party.pos=party.pos,voters.mat=affl)
+
+   ##create an empty matrix to fill with new party position
+  party.pos<-matrix(rep(0,6),3,2)
+  
+  ##make dataframe for ease of calling later
+  affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
+  
+  ##figure out which observations are dems, reps, and greens
+  which.dems<-which(affl1$affiliation=="Dem")
+  which.reps<-which(affl1$affiliation=="Rep")
+  which.greens<-which(affl1$affiliation=="Green")
+  
+  ##make a matrix of dems, reps, and greens.
+  dems<-affl1[which.dems,]
+  reps<-affl1[which.reps,]
+  greens<-affl1[which.greens,]
+  
+  ##Fill in new party position, which is mean x and mean y
+  party.pos[3,]<-c(mean(as.numeric(greens$x)), 
+                 mean(as.numeric(greens$y)))
+  party.pos[2,]<-c(mean(as.numeric(dems$x)), 
+                 mean(as.numeric(dems$y)))
+  party.pos[1,]<-c(mean(as.numeric(reps$x)), 
+                 mean(as.numeric(reps$y)))
+
+#Append the changed party position to party.vector, which is the previous party position.
+  party.vector <- c(party.vector,party.pos)
+  
+#Plot time t+1.  
+visualization.party.number.option(party.pos=party.pos,voters.mat=affl)
+  
+}
+
+#Convert party.vector into a matrix.
+party.mat<-matrix(party.vector, ncol=6, byrow=TRUE)
+
+#Rearrange the columns appropriately.
+party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4],party.mat[,5],party.mat[,6])
+colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y","green.x","green.y")
+
+return(party.mat)
+}
+
+#Try run the function.
+party.relocation.party.number.option(n=500, mean=0, sd=2,iter=10, method="std.norm", seed=sample(1:10000, 1),party.number=3)
