@@ -682,3 +682,89 @@ prwpv(distance=0.5,iter=20) ##Test it out
 
 ##Question 3
 
+#In this function, we model the Republican Party as the sticker and the Democratic Party as the aggregator. In other words, the Republican Party sticks to its position throughout the simulation whereas the Democratic Party shifts its position to the mean position of its supporters.
+sticker.model<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", seed=sample(1:10000, 1)){
+  
+  #Set the random seed based on the seed specified
+  set.seed(seed)
+
+  #According to the voter distribution type chosen, run the voters function appropriately to get voter preferences.
+	if(method=="std.norm"){
+		voters <- voters(method,n)
+	}
+	if(method=="normal.with.var.option"){
+		sd <- c(sample(1:5,1),sample(1:5,1))
+		voters <- voters(method,n,sd)
+	}
+	if(method=="unif.voters"){
+		voters <- voters(method,n)
+	}
+	if(method=="mvnorm.voters"){
+		mu <- c(sample(-5:5,1),sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		voters <- voters(method,n,mu=mu,Sigma=Sigma)
+	}
+	if(method=="mvnorm.mix"){
+		mu <- replicate(6,sample(-5:5,1))
+		Sigma <- make.positive.definite(matrix(sample(1:7,4),2,2))
+		distnum <- sample(1:3,1)
+    voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
+	}
+
+ ##randomly calculates initial party position.
+  	party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
+
+#Store initial party position in party.vector, which will be expanded throughout the simulation.
+    party.vector <- as.vector(party.pos)
+  	
+#The for loop iterates the simulation the designated amount of times.
+	for(i in 1:iter){
+  	
+  ##calculates affiliation using function above
+  affl<-affiliation(voter.pos=voters,party.pos=party.pos)
+  
+  ##setting graphing parameters to view two at a time to see before and after
+   par(mfrow=c(1,2))
+   
+  ##visualize initial scenario at time t
+visualization(party.pos=party.pos,voters.mat=affl)
+
+   ##In party.pos, keep the first row (Republican Party) fixed, but empty the second row (Democratic Party) so that the Democratic Party's position can be updated.
+   party.pos <- rbind(party.pos[1,],(matrix(rep(0,2),1,2)))
+  
+  ##make dataframe for ease of calling later
+  affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
+  
+  ##figure out which observations are dems
+  which.dems<-which(affl1$affiliation=="Dem")
+  
+  ##make a matrix of dems
+  dems<-affl1[which.dems,]
+  
+  ##Fill in the Democratic Party's new position, which is mean x and mean y
+  party.pos[2,]<-c(mean(as.numeric(dems$x)), 
+                 mean(as.numeric(dems$y)))
+  
+
+#Append the changed party position to party.vector, which is the previous party position.
+  party.vector <- c(party.vector,party.pos)
+  
+#Plot time t+1.  
+visualization(party.pos=party.pos,voters.mat=affl)
+  
+}
+
+#Convert party.vector into a matrix.
+party.mat<-matrix(party.vector, ncol=4, byrow=TRUE)
+
+#Rearrange the columns appropriately.
+party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4])
+colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y")
+
+return(party.mat)
+}
+
+#Try out the function
+sticker.model(iter=10)
+
+#We can see from the output of the simulation that the Republican Party (sticker) is electorally defeated by the Democratic Party (aggregator). Also, we can see that the Democratic Party stabilizes very early in the simulation by fixating on the mean position of its supporters. This is probably because the Republican Party does not move. From this exercsie, we learn that sticking to a single position is not a wise strategy when the rival party is actively seeking to match the mean voter position. 
