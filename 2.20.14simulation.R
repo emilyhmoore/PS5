@@ -552,6 +552,8 @@ return(party.mat)
 party.relocation.party.number.option(n=500, mean=0, sd=2,iter=10, method="std.norm", seed=sample(1:10000, 1),party.number=3)
 party.relocation.party.number.option(party.number=2)
 
+#Substantive results do not change. As the simulation continues, all three parties stably locate themselves at the mean voter preference.
+
 
 ###Expand your model part 2
 ##affiliation based on settable distance. If the parties are within "distance"
@@ -587,7 +589,7 @@ affiliation.prob<-function(voter.pos,party.pos,distance=0.5){
 }
 
 
-##prsvp stands for party relocation with probabilitic voting
+##prwpv stands for party relocation with probabilitic voting
 prwpv<-function(n=500, mean=0, sd=2,iter=5, method="std.norm", 
                 seed=sample(1:10000, 1), distance=0.5){
   
@@ -671,6 +673,12 @@ prwpv<-function(n=500, mean=0, sd=2,iter=5, method="std.norm",
   
   return(party.mat)
 }
-prwpv(distance=0.5) ##Test it out
+
+prwpv(distance=0.5,iter=20) ##Test it out
 ##usually works. Occasionally produces nans in party positions. 
+
+#When voters vote according to ideological proximity as in the original function, the numbers of Republican and Democratic supporters even out and the positions of parties become stable as the simulation continues. But in the current model in which voters vote probabilistically, the positions of parties constantly shift because the number of voters voting Republican or Democrat shifts unpredictably.
+
+
+##Question 3
 
