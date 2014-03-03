@@ -428,7 +428,7 @@ party.relocation.party.number.option<-function(n=500, mean=0, sd=2,iter=5, metho
 		distnum <- sample(1:3,1)
     voters <- voters(method,n,mu=mu,Sigma=Sigma,distnum=distnum)
 	}
-
+if(party.number==3){
  ##randomly calculates initial party position.
   	party.pos<- matrix(rnorm(party.number*2,mean=mean,sd=sd),party.number,2)
 
@@ -483,11 +483,70 @@ visualization.party.number.option(party.pos=party.pos,voters.mat=affl)
 party.mat<-matrix(party.vector, ncol=6, byrow=TRUE)
 
 #Rearrange the columns appropriately.
-party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4],party.mat[,5],party.mat[,6])
+party.mat<-cbind(party.mat[,1], party.mat[,3], 
+                 party.mat[,2], party.mat[,4],
+                 party.mat[,5],party.mat[,6])
 colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y","green.x","green.y")
 
 return(party.mat)
+} else {
+  ##randomly calculates initial party position.
+  party.pos<- matrix(rnorm(4,mean=mean,sd=sd),2,2)
+  
+  #Store initial party position in party.vector, which will be expanded throughout the simulation.
+  party.vector <- as.vector(party.pos)
+  
+  #The for loop iterates the simulation the designated amount of times.
+  for(i in 1:iter){
+    
+    ##calculates affiliation using function above
+    affl<-affiliation(voter.pos=voters,party.pos=party.pos)
+    
+    ##setting graphing parameters to view two at a time to see before and after
+    par(mfrow=c(1,2))
+    
+    ##visualize initial scenario at time t
+    visualization(party.pos=party.pos,voters.mat=affl)
+    
+    ##create an empty matrix to fill with new party position
+    party.pos<-matrix(rep(0,4),2,2)
+    
+    ##make dataframe for ease of calling later
+    affl1<-as.data.frame(affl, stringsAsFactors=FALSE)
+    
+    ##figure out which observations are dems
+    which.dems<-which(affl1$affiliation=="Dem")
+    
+    ##make a matrix of dems and one of reps
+    dems<-affl1[which.dems,]
+    reps<-affl1[-which.dems,]
+    
+    ##Fill in new party position, which is mean x and mean y
+    party.pos[2,]<-c(mean(as.numeric(dems$x)), 
+                     mean(as.numeric(dems$y)))
+    party.pos[1,]<-c(mean(as.numeric(reps$x)), 
+                     mean(as.numeric(reps$y)))
+    
+    #Append the changed party position to party.vector, which is the previous party position.
+    party.vector <- c(party.vector,party.pos)
+    
+    #Plot time t+1.  
+    visualization(party.pos=party.pos,voters.mat=affl)
+    
+  }
+  
+  #Convert party.vector into a matrix.
+  party.mat<-matrix(party.vector, ncol=4, byrow=TRUE)
+  
+  #Rearrange the columns appropriately.
+  party.mat<-cbind(party.mat[,1], party.mat[,3], party.mat[,2], party.mat[,4])
+  colnames(party.mat)<-c("rep.x", "rep.y", "dem.x", "dem.y")
+  
+  return(party.mat)
 }
+}
+
 
 #Try run the function.
 party.relocation.party.number.option(n=500, mean=0, sd=2,iter=10, method="std.norm", seed=sample(1:10000, 1),party.number=3)
+party.relocation.party.number.option(party.number=2)

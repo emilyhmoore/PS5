@@ -306,4 +306,4 @@ parameter2 <- seq(1,4,length.out=10)
 parameters.df <- expand.grid(mean=parameter1,sd=parameter2)
 
 #Run party.relocation() throughout the parameter space.
-laply(.data=parameters.df,.fun=party.relocation,.parallel=TRUE)
+laply(.data=parameters.df,.fun=party.relocation,.parallel=FALSE)
